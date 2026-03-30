@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOLF LABS | Philosophy HW</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@300;400;600;700;800;900&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- WOLF LABS SUPREME ENGINE V5.5 (HW EDITION - B2 LIFESTYLE) --- */
+        :root {
+            --bg: #030604;
+            --surface: #0b150e;
+            --border: #1a3321;
+            --accent: #1DB954; /* SPOTIFY GREEN */
+            --accent-glow: rgba(29, 185, 84, 0.4);
+            --correct: #1DB954;
+            --incorrect: #E22134; 
+            --text: #FFFFFF;
+            --text-dim: #9ca8a1;
+            --font-display: 'Montserrat', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-body); -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, rgba(29, 185, 84, 0.08) 0%, transparent 70%),
+                              url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        /* --- UI OVERLAY --- */
+        .header { position: fixed; top: 0; left: 0; right: 0; height: 80px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; z-index: 100; background: rgba(3, 6, 4, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); box-shadow: 0 5px 30px rgba(0,0,0,0.7); }
+        .logo { font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; }
+        .logo span { color: var(--accent); }
+        .progress-container { position: absolute; bottom: -1px; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.05); }
+        .progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* --- CARD SYSTEM --- */
+        main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; z-index: 10; }
+        
+        .card-stack { position: relative; width: 100%; max-width: 500px; height: 600px; }
+
+        .card {
+            position: absolute; width: 100%; height: 100%;
+            background: var(--surface); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border); border-radius: 24px; padding: 45px 40px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            opacity: 0; transform: scale(0.9) translateY(40px); pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            visibility: hidden;
+        }
+
+        .card.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; visibility: visible; z-index: 10; }
+        .card.exit { opacity: 0; transform: scale(1.1) translateY(-100px); pointer-events: none; visibility: visible; }
+
+        /* --- CONTENT ELEMENTS --- */
+        .q-icon-box { 
+            width: 110px; height: 110px; border-radius: 24px; 
+            background: rgba(29, 185, 84, 0.08); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 25px; color: var(--accent); font-size: 3rem;
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+        }
+        
+        h1 { font-family: var(--font-display); font-size: 2.2rem; margin-bottom: 10px; line-height: 1.1; text-transform: uppercase; }
+        .badge { background: rgba(29, 185, 84, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 6px 16px; border-radius: 500px; font-weight: 800; font-size: 0.8rem; margin-bottom: 25px; letter-spacing: 2px; }
+        .q-text { font-size: 1.35rem; font-weight: 700; margin-bottom: 30px; color: #fff; line-height: 1.5; }
+        
+        /* --- BUTTONS --- */
+        .options-grid { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+        .opt-btn {
+            width: 100%; padding: 18px; border-radius: 16px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03); color: #fff; font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; text-align: left; display: flex; align-items: center; justify-content: space-between;
+        }
+        .opt-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); transform: translateX(8px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .opt-btn.correct { background: var(--correct) !important; color: #000; border-color: var(--correct); box-shadow: 0 10px 20px rgba(29, 185, 84, 0.3); font-weight: 800; }
+        .opt-btn.wrong { background: var(--incorrect) !important; color: #fff; border-color: var(--incorrect); animation: shake 0.4s; }
+
+        .btn-start { 
+            padding: 18px 50px; border-radius: 500px; background: var(--accent); color: #000; 
+            font-weight: 900; font-size: 1.1rem; text-transform: uppercase; border: none; cursor: pointer;
+            box-shadow: 0 15px 30px var(--accent-glow); transition: 0.3s; letter-spacing: 2px;
+            margin-top: auto;
+        }
+        .btn-start:hover { transform: scale(1.05) translateY(-5px); background: #fff; color: #000; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-8px); } 50% { transform: translateX(8px); } }
+
+        /* --- MOBILE --- */
+        @media (max-width: 480px) {
+            .card { padding: 30px 20px; border-radius: 24px; }
+            h1 { font-size: 1.8rem; }
+            .q-icon-box { width: 90px; height: 90px; font-size: 2.5rem; }
+            .card-stack { height: 520px; }
+            .q-text { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">WOLF<span>LABS</span> | HW</div>
+        <div id="counter" style="font-family: var(--font-code); color: var(--accent); font-weight: 800; font-size: 1.1rem;">0/5</div>
+        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </header>
+
+    <main>
+        <div class="card-stack" id="deck">
+            
+            <!-- COVER (SCENE 0) -->
+            <div class="card active" id="card-0">
+                <div class="q-icon-box"><i class="fa-solid fa-brain"></i></div>
+                <div class="badge">MISSION: LIFESTYLE</div>
+                <h1>ANATOMY OF<br>REGRET</h1>
+                <p style="margin-top: 15px; color: var(--text-dim); line-height: 1.6; font-size: 1.1rem;">Practice your Philosophy English.<br>Level B2 Upper-Intermediate.</p>
+                <button class="btn-start" onclick="nextCard()">Start Mission</button>
+            </div>
+
+            <!-- QUESTION 1 -->
+            <div class="card" id="card-1">
+                <div class="q-icon-box"><i class="fa-solid fa-road-circle-xmark"></i></div>
+                <div class="q-text">You are at a critical decision point in your life. You are at a...</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) screw-up</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) juncture</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) candor</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 2 -->
+            <div class="card" id="card-2">
+                <div class="q-icon-box"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="q-text">I didn't take the chance. <br><br>"If only I ______ the chance."</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) have taken</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) had taken</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) took</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 3 -->
+            <div class="card" id="card-3">
+                <div class="q-icon-box"><i class="fa-solid fa-handshake-angle"></i></div>
+                <div class="q-text">The quality of being open, honest, and direct is called...</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) boldness</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">B) candor</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) drifting</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 4 -->
+            <div class="card" id="card-4">
+                <div class="q-icon-box"><i class="fa-solid fa-ban"></i></div>
+                <div class="q-text">I played it safe.<br><br>"If only I ______ it safe."</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, true)">A) hadn't played</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">B) didn't play</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">C) haven't played</button>
+                </div>
+            </div>
+
+            <!-- QUESTION 5 -->
+            <div class="card" id="card-5">
+                <div class="q-icon-box"><i class="fa-solid fa-people-arrows"></i></div>
+                <div class="q-text">When friends slowly lose contact and emotional connection over time, they...</div>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="handleChoice(this, false)">A) reach out</button>
+                    <button class="opt-btn" onclick="handleChoice(this, false)">B) play it safe</button>
+                    <button class="opt-btn" onclick="handleChoice(this, true)">C) drift apart</button>
+                </div>
+            </div>
+
+            <!-- FINAL SCENE -->
+            <div class="card" id="card-final">
+                <div class="q-icon-box" style="color: var(--correct); border-color: var(--correct); background: rgba(29, 185, 84, 0.08);"><i class="fa-solid fa-trophy"></i></div>
+                <h1>WELL DONE!</h1>
+                <p style="color: var(--text-dim); margin: 20px 0; font-size: 1.2rem;">Mission Accomplished.<br>Philosophy Regrets: 100%</p>
+                <button class="btn-start" onclick="location.reload()">Try Again</button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let currentStep = 0;
+        const totalQuestions = 5;
+
+        function updateUI() {
+            if(currentStep > 0 && currentStep <= totalQuestions) {
+                document.getElementById('counter').innerText = `${currentStep}/${totalQuestions}`;
+            } else if (currentStep > totalQuestions) {
+                document.getElementById('counter').innerText = `DONE`;
+            }
+
+            const progress = (currentStep / (totalQuestions + 1)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function nextCard() {
+            const currentCard = document.querySelector('.card.active');
+            if (currentCard) {
+                currentCard.classList.remove('active');
+                currentCard.classList.add('exit');
+            }
+
+            currentStep++;
+            updateUI();
+
+            const nextId = currentStep > totalQuestions ? 'card-final' : `card-${currentStep}`;
+            const nextCard = document.getElementById(nextId);
+            
+            setTimeout(() => {
+                if (nextCard) nextCard.classList.add('active');
+            }, 150);
+        }
+
+        function handleChoice(btn, isCorrect) {
+            const options = btn.parentElement.querySelectorAll('.opt-btn');
+            
+            if(isCorrect) {
+                btn.classList.add('correct');
+                btn.innerHTML += ' <i class="fa-solid fa-check"></i>';
+                options.forEach(opt => opt.style.pointerEvents = 'none');
+                
+                setTimeout(() => {
+                    nextCard();
+                }, 900);
+            } else {
+                btn.classList.add('wrong');
+                btn.innerHTML += ' <i class="fa-solid fa-xmark"></i>';
+                btn.style.pointerEvents = 'none';
+            }
+        }
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
